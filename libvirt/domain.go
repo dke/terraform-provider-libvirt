@@ -216,7 +216,7 @@ func newDiskForCloudInit(virConn *libvirt.Libvirt, volumeKey string, bus string)
 		Device: "cdrom",
 		Target: &libvirtxml.DomainDiskTarget{
 			// Last device letter possible with a single IDE controller on i440FX
-			Dev: "hdd",
+			Dev: "sda",
 			Bus: bus,
 		},
 		Driver: &libvirtxml.DomainDiskDriver{
@@ -694,6 +694,13 @@ func setCloudinit(d *schema.ResourceData, domainDef *libvirtxml.Domain, virConn 
 		if err != nil {
 			return err
 		}
+
+		domainDef.Devices.Controllers = append(domainDef.Devices.Controllers,
+			libvirtxml.DomainController{
+				Type:  "scsi",
+				Model: "virtio-scsi",
+			})
+
 		domainDef.Devices.Disks = append(domainDef.Devices.Disks, disk)
 	}
 
