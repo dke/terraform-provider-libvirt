@@ -216,8 +216,8 @@ func newDiskForCloudInit(virConn *libvirt.Libvirt, volumeKey string) (libvirtxml
 		Device: "cdrom",
 		Target: &libvirtxml.DomainDiskTarget{
 			// Last device letter possible with a single IDE controller on i440FX
-			Dev: "hdd",
-			Bus: "ide",
+			Dev: "sda",
+			Bus: "scsi",
 		},
 		Driver: &libvirtxml.DomainDiskDriver{
 			Name: "qemu",
@@ -503,16 +503,10 @@ func setDisks(d *schema.ResourceData, domainDef *libvirtxml.Domain, virConn *lib
 		prefix := fmt.Sprintf("disk.%d", i)
 		if d.Get(prefix + ".scsi").(bool) {
 			disk.Target = &libvirtxml.DomainDiskTarget{
-				Dev: fmt.Sprintf("sd%s", diskLetterForIndex(numOfSCSIs)),
-				Bus: "scsi",
+				Dev: fmt.Sprintf("vd%s", diskLetterForIndex(numOfSCSIs)),
+				Bus: "virtio",
 			}
 			scsiDisk = true
-			if wwn, ok := d.GetOk(prefix + ".wwn"); ok {
-				disk.WWN = wwn.(string)
-			} else {
-				//nolint:mnd
-				disk.WWN = randomWWN(10)
-			}
 
 			numOfSCSIs++
 		}
