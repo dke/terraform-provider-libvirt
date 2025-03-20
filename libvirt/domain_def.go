@@ -78,9 +78,14 @@ func newDomainDef() libvirtxml.Domain {
 			},
 		},
 		Features: &libvirtxml.DomainFeatureList{
-			PAE:  &libvirtxml.DomainFeature{},
-			ACPI: &libvirtxml.DomainFeature{},
-			APIC: &libvirtxml.DomainFeatureAPIC{},
+			VMPort: &libvirtxml.DomainFeatureState{State: "off"},
+			SMM:    &libvirtxml.DomainFeatureSMM{State: "on"},
+			ACPI:   &libvirtxml.DomainFeature{},
+			APIC:   &libvirtxml.DomainFeatureAPIC{},
+		},
+		PM: &libvirtxml.DomainPM{
+			SuspendToMem:  &libvirtxml.DomainPMPolicy{Enabled: "no"},
+			SuspendToDisk: &libvirtxml.DomainPMPolicy{Enabled: "no"},
 		},
 	}
 
@@ -95,6 +100,32 @@ func newDomainDef() libvirtxml.Domain {
 			Model: "virtio",
 			Backend: &libvirtxml.DomainRNGBackend{
 				Random: &libvirtxml.DomainRNGBackendRandom{Device: rngDev},
+			},
+		},
+	}
+
+	domainDef.Devices.Serials = []libvirtxml.DomainSerial{
+		{
+			Target: &libvirtxml.DomainSerialTarget{
+				Type: "isa-serial",
+				Model: &libvirtxml.DomainSerialTargetModel{
+					Name: "isa-serial",
+				},
+			},
+		},
+	}
+
+	domainDef.Devices.Inputs = []libvirtxml.DomainInput{
+		{
+			Type: "tablet",
+			Bus:  "usb",
+		},
+	}
+
+	domainDef.Devices.Videos = []libvirtxml.DomainVideo{
+		{
+			Model: libvirtxml.DomainVideoModel{
+				Type: "virtio",
 			},
 		},
 	}
